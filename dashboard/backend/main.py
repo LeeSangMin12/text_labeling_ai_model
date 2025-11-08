@@ -3,8 +3,9 @@
 FastAPI를 사용한 데이터셋 검수 시스템
 """
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Dict, Optional, Any
 import pandas as pd
@@ -724,6 +725,48 @@ async def batch_inspect(request: BatchInspectionRequest):
                 "pass_rate": result_data["pass_rate"]
             }
         }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/data/upload/{data_type}")
+async def upload_data_file(data_type: str, file: UploadFile = File(...)):
+    """데이터 파일 업로드"""
+    try:
+        # data_type 검증
+        if data_type not in ["preprocessed", "labeled"]:
+            raise HTTPException(status_code=400, detail="Invalid data_type. Use 'preprocessed' or 'labeled'")
+
+        # 파일 확장자 확인
+        if not file.filename.endswith('.csv'):
+            raise HTTPException(status_code=400, detail="Only CSV files are allowed")
+
+        # 데이터 디렉토리 생성
+        data_dir = Path("/app/data/final") if Path("/app").exists() else Path("../../data/final")
+        data_dir.mkdir(parents=True, exist_ok=True)
+
+        # 파일 경로 설정
+        if data_type == "preprocessed":
+            file_path = data_dir / "preprocessed_data.csv"
+        else:
+            file_path = data_dir / "labeled_data.csv"
+
+        # 파일 저장
+        with open(file_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+
+        # 저장된 파일 확인
+        file_size = file_path.stat().st_size
+
+        return JSONResponse(content={
+            "success": True,
+            "message": f"{data_type} 데이터 파일이 성공적으로 업로드되었습니다.",
+            "file_path": str(file_path),
+            "file_size": file_size,
+            "file_size_mb": round(file_size / 1024 / 1024, 2)
+        })
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
