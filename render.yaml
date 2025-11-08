@@ -1,0 +1,30 @@
+services:
+  # Backend Service
+  - type: web
+    name: inspection-dashboard-backend
+    env: docker
+    dockerfilePath: ./dashboard/backend/Dockerfile
+    dockerContext: ./dashboard/backend
+    envVars:
+      - key: ALLOWED_ORIGINS
+        value: "*"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    disk:
+      name: inspection-data
+      mountPath: /app/data
+      sizeGB: 1
+    healthCheckPath: /
+
+  # Frontend Service
+  - type: web
+    name: inspection-dashboard-frontend
+    env: docker
+    dockerfilePath: ./dashboard/frontend/Dockerfile
+    dockerContext: ./dashboard/frontend
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: inspection-dashboard-backend
+          property: host
