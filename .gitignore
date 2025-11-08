@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Inspection results (검수 결과는 제외)
+inspection_results/
+dashboard/inspection_results/
+
+# Trash
+trash_can/
+
+# Data files (대용량 데이터 파일 제외)
+data/raw/
+data/processed/
+data/legacy_processed/
+data/legacy_final/
+_unused_files/
+*.csv
+*.pkl
+*.xlsx
+!dashboard/data/**/*.csv
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
