@@ -39,11 +39,12 @@ app.add_middleware(
 )
 
 # 데이터 경로
-DATA_DIR = Path("../../data")
+# Docker/Fly.io 환경에서는 절대 경로 사용
+DATA_DIR = Path("/app/data") if Path("/app/data").exists() else Path("../../data")
 PREPROCESSED_DATA_PATH = DATA_DIR / "final" / "preprocessed_data.csv"
 LABELED_DATA_PATH = DATA_DIR / "final" / "labeled_data.csv"
-INSPECTION_DIR = Path("../../inspection_results")
-INSPECTION_DIR.mkdir(exist_ok=True)
+INSPECTION_DIR = Path("/app/inspection_results") if Path("/app").exists() else Path("../../inspection_results")
+INSPECTION_DIR.mkdir(exist_ok=True, parents=True)
 
 # Pydantic 모델
 class SimilarityCheck(BaseModel):
